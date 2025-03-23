@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Payment Info</title>
+</head>
+<body>
+    <h2>Add Payment Info</h2>
+    <form method="POST" action="{% url 'add_payment_info' %}">
+        {% csrf_token %}
+        
+        <label for="title">Title:</label>
+        <input type="text" name="title" id="title" required>
+        
+        <label for="ivac_login_info">Select IVAC Login Info:</label>
+        <select name="ivac_login_info" id="ivac_login_info" required>
+            {% for login_info in ivac_login_info_list %}
+                <option value="{{ login_info.id }}">{{ login_info.id }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="email">Email (optional):</label>
+        <input type="email" name="email" id="email">
+
+        <h3>Payment Info</h3>
+        <div>
+            <label for="bgd1">BGD 1:</label>
+            <input type="text" name="bgd1" id="bgd1">
+            <label for="name1">Name 1:</label>
+            <input type="text" name="name1" id="name1">
+        </div>
+        <div>
+            <label for="bgd2">BGD 2:</label>
+            <input type="text" name="bgd2" id="bgd2">
+            <label for="name2">Name 2:</label>
+            <input type="text" name="name2" id="name2">
+        </div>
+        <div>
+            <label for="bgd3">BGD 3:</label>
+            <input type="text" name="bgd3" id="bgd3">
+            <label for="name3">Name 3:</label>
+            <input type="text" name="name3" id="name3">
+        </div>
+        <div>
+            <label for="bgd4">BGD 4:</label>
+            <input type="text" name="bgd4" id="bgd4">
+            <label for="name4">Name 4:</label>
+            <input type="text" name="name4" id="name4">
+        </div>
+        <div>
+            <label for="bgd5">BGD 5:</label>
+            <input type="text" name="bgd5" id="bgd5">
+            <label for="name5">Name 5:</label>
+            <input type="text" name="name5" id="name5">
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

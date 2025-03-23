@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login to IVAC</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="container mt-5">
+    <h2 class="text-center">Login to IVAC</h2>
+
+    <!-- Login Form -->
+    <form id="login-form" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.mobile_no.label_tag }} 
+            {{ form.mobile_no }}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label_tag }} 
+            {{ form.password }}
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+    <!-- OTP Form (Initially Hidden) -->
+    <div id="otp-section" style="display:none;">
+        <h4>Enter OTP</h4>
+        <form id="otp-form">
+            {% csrf_token %}
+            <input type="hidden" id="session_id" value="">  <!-- Store session_id -->
+            <div class="mb-3">
+                <input type="text" id="otp" class="form-control" maxlength="6" required />
+            </div>
+            <button type="submit" class="btn btn-success">Submit OTP</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let session_id = "";
+
+            // Handle Login Form Submission
+            $('#login-form').submit(function(event) {
+                event.preventDefault();
+                const mobile_no = $('input[name="mobile_no"]').val();
+                const password = $('input[name="password"]').val();
+
+                $.ajax({
+                    url: '/api/login/',
+                    method: 'POST',
+                    data: {
+                        mobile_no: mobile_no,
+                        password: password,
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            session_id = response.session_id;  // Store session ID
+                            $('#session_id').val(session_id);  // Store in hidden input
+                            $('#otp-section').show();  // Show OTP form
+                            Swal.fire('Success', 'Login successful! Enter OTP.', 'success');
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Something went wrong!', 'error');
+                    }
+                });
+            });
+
+            // Handle OTP Form Submission
+            $('#otp-form').submit(function(event) {
+                event.preventDefault();
+                const otp = $('#otp').val();
+                const session_id = $('#session_id').val();  // Get stored session ID
+
+                if (!session_id) {
+                    Swal.fire('Error', 'Session expired! Please login again.', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/submit_otp/',
+                    method: 'POST',
+                    data: {
+                        otp: otp,
+                        session_id: session_id,  // Send session_id with request
+                        csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            Swal.fire('Success', 'OTP submitted successfully!', 'success');
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Something went wrong!', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
